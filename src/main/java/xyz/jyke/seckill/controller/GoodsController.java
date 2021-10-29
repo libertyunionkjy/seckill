@@ -25,8 +25,8 @@ public class GoodsController {
      */
     @RequestMapping("/toList")
     //通过cookie的名称拿到了cookie的值
-    public String toLogin(HttpServletRequest request, HttpServletResponse response, Model model, @CookieValue("userTicket") String ticket) {
-        //判断ticket是不是空，如果为空代表没登陆
+    public String toLogin(Model model, User user) {
+        /*//判断ticket是不是空，如果为空代表没登陆
         if (StringUtils.isEmpty(ticket)) {
             return "login";
         }
@@ -39,8 +39,11 @@ public class GoodsController {
 
         if (null == user) {
             return "login";
-        }
+        }*/
         //如果都没问题，把用户对象放到Model中去
+        if (user == null) {
+            return "login";
+        }
         model.addAttribute("user", user);
         return "goodsList";
     }
