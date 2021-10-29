@@ -41,9 +41,9 @@ public class GoodsController {
             return "login";
         }*/
         //如果都没问题，把用户对象放到Model中去
-        if (user == null) {
-            return "login";
-        }
+        //if (user == null) {
+        //    return "login";
+        //}
         model.addAttribute("user", user);
         return "goodsList";
     }
