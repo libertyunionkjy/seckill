@@ -18,4 +18,41 @@
         id, goods_name, goods_title, goods_img, goods_detail, goods_price, goods_stock
     </sql>
 
+    <select id="findGoodsVo" resultType="xyz.jyke.seckill.vo.GoodsVo">
+        SELECT
+            g.id,
+            g.goods_name,
+            g.goods_title,
+            g.goods_img,
+            g.goods_detail,
+            g.goods_price,
+            g.goods_stock,
+            sg.seckill_price,
+            sg.stock_count,
+            sg.start_date,
+            sg.end_date
+        FROM
+            t_goods AS g
+            LEFT JOIN t_seckill_goods AS sg ON g.id = sg.goods_id
+    </select>
+
+    <select id="findGoodsVoByGoodsId" resultType="xyz.jyke.seckill.vo.GoodsVo" parameterType="java.lang.Long">
+        SELECT
+            g.id,
+            g.goods_name,
+            g.goods_title,
+            g.goods_img,
+            g.goods_detail,
+            g.goods_price,
+            g.goods_stock,
+            sg.seckill_price,
+            sg.stock_count,
+            sg.start_date,
+            sg.end_date
+        FROM
+            t_goods AS g
+            LEFT JOIN t_seckill_goods AS sg ON g.id = sg.goods_id
+        where g.id = #{goodsId}
+    </select>
+
 </mapper>
