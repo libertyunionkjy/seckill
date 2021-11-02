@@ -80,7 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         //reponse中加上了cookie，这一步我们在客户端保存了cookie
         CookieUtil.setCookie(request, response, "userTicket", ticket);
-        return RespBean.success();
+        return RespBean.success(ticket);
     }
 
     /**

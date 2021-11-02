@@ -26,6 +26,8 @@ public class GoodsController {
 
     /**
      * 跳转到商品列表页面
+     * windows优化前：800
+     * linux优化前：200
      *
      * @return
      */
