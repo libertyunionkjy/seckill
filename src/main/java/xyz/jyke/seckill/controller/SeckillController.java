@@ -15,9 +15,8 @@ import xyz.jyke.seckill.vo.GoodsVo;
 import xyz.jyke.seckill.vo.RespBeanEnum;
 
 /**
- * <p>
- * 前端控制器
- * </p>
+ * 优化前MacQPS：400
+ * 优化前服务器QPS：101.6
  *
  * @author junyu
  * @since 1.0.0
