@@ -24,7 +24,10 @@ public enum RespBeanEnum {
     BIND_ERROR(500213,"参数校验异常"),
     //秒杀模块
     EMPTY_STOCK(500500, "库存不足"),
-    REPEATE_ERROR(500501,"不能重复秒杀！只能限购一件");
+    REPEATE_ERROR(500501,"不能重复秒杀！只能限购一件"),
+    //更新密码
+    MOBILE_NOT_EXIST(500213, "手机号码不存在"),
+    PASSWORD_UPDATE_FAIL(500214, "密码更新失败");
 
     private final Integer code;
     private final String message;

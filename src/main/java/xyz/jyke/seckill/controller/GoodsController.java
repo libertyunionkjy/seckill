@@ -14,7 +14,9 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import xyz.jyke.seckill.pojo.User;
 import xyz.jyke.seckill.service.IGoodsService;
 import xyz.jyke.seckill.service.IUserService;
+import xyz.jyke.seckill.vo.DetailVo;
 import xyz.jyke.seckill.vo.GoodsVo;
+import xyz.jyke.seckill.vo.RespBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,8 +37,10 @@ public class GoodsController {
 
     /**
      * 跳转到商品列表页面
-     * windows优化前：800
+     * Mac优化前：800
      * linux优化前：200
+     * <p>
+     * Mac页面缓存：4000
      *
      * @return
      */
@@ -51,7 +55,8 @@ public class GoodsController {
             return html;
         }
         model.addAttribute("user", user);
-        model.addAttribute("goodsList", goodsService.findGoodsVo()); // return "goodsList";
+        model.addAttribute("goodsList", goodsService.findGoodsVo());
+        // return "goodsList";
         //如果为空，手动渲染，存入Redis并返回
         WebContext context = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("goodsList", context);
@@ -87,8 +92,15 @@ public class GoodsController {
      * @param model   * @param user
      * @param goodsId * @return
      */
-    @RequestMapping("/toDetail/{goodsId}")
-    public String toDetail(Model model, User user, @PathVariable Long goodsId) {
+    @RequestMapping(value = "/toDetail/{goodsId}", produces = "text/html;charset=utf-8")
+    @ResponseBody
+    public String toDetail2(HttpServletRequest request, HttpServletResponse response, Model model, User user, @PathVariable Long goodsId) {
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        //Redis中获取页面，如果不为空，直接返回页面
+        String html = (String) valueOperations.get("goodsDetail:" + goodsId);
+        if (!StringUtils.isEmpty(html)) {
+            return html;
+        }
         model.addAttribute("user", user);
         GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
         model.addAttribute("goods", goods);
@@ -114,6 +126,51 @@ public class GoodsController {
         }
         model.addAttribute("secKillStatus", secKillStatus);
         model.addAttribute("remainSeconds", remainSeconds);
-        return "goodsDetail";
+        //return "goodsDetail";
+        //如果为空，手动渲染，存入Redis并返回
+        WebContext context = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
+        html = thymeleafViewResolver.getTemplateEngine().process("goodsDetail", context);
+        if (!StringUtils.isEmpty(html)) {
+            valueOperations.set("goodsDetail:" + goodsId, html, 60, TimeUnit.SECONDS);
+        }
+        return html;
+    }
+
+    /**
+     * 跳转商品详情页
+     *
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/detail/{goodsId}")
+    @ResponseBody
+    public RespBean toDetail(Model model, User user, @PathVariable Long goodsId) {
+        GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
+        Date startDate = goods.getStartDate();
+        Date endDate = goods.getEndDate();
+        Date nowDate = new Date();
+        //秒杀状态
+        int secKillStatus = 0;
+        //剩余开始时间
+        int remainSeconds = 0;
+        //秒杀还未开始
+        if (nowDate.before(startDate)) {
+            remainSeconds = (int) ((startDate.getTime() - nowDate.getTime()) / 1000);
+        // 秒杀已结束
+        } else if (nowDate.after(endDate)) {
+            secKillStatus = 2;
+            remainSeconds = -1; // 秒杀中
+        } else {
+            secKillStatus = 1;
+            remainSeconds = 0;
+        }
+        DetailVo detailVo = new DetailVo();
+        detailVo.setGoodsVo(goods);
+        detailVo.setUser(user);
+        detailVo.setRemainSeconds(remainSeconds);
+        detailVo.setSecKillStatus(secKillStatus);
+        return RespBean.success(detailVo);
     }
 }
