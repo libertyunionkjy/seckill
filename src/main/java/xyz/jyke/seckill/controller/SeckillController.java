@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import xyz.jyke.seckill.pojo.Order;
 import xyz.jyke.seckill.pojo.SeckillOrder;
 import xyz.jyke.seckill.pojo.User;
@@ -12,6 +14,7 @@ import xyz.jyke.seckill.service.IGoodsService;
 import xyz.jyke.seckill.service.IOrderService;
 import xyz.jyke.seckill.service.ISeckillOrderService;
 import xyz.jyke.seckill.vo.GoodsVo;
+import xyz.jyke.seckill.vo.RespBean;
 import xyz.jyke.seckill.vo.RespBeanEnum;
 
 /**
@@ -31,8 +34,8 @@ public class SeckillController {
     @Autowired
     private IOrderService orderService;
 
-    @RequestMapping("/doSeckill")
-    public String doSeckill(Model model, User user, Long goodsId) {
+    @RequestMapping("/doSeckill2")
+    public String doSeckill2(Model model, User user, Long goodsId) {
         if (user == null) {
             return "login";
         }
@@ -53,5 +56,25 @@ public class SeckillController {
         model.addAttribute("order", order);
         model.addAttribute("goods", goods);
         return "orderDetail";
+    }
+
+    @RequestMapping(value = "/doSeckill", method = RequestMethod.POST)
+    @ResponseBody
+    public RespBean doSeckill(User user, Long goodsId) {
+        if (user == null) {
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+        GoodsVo goods = goodsService.findGoodsVoByGoodsId(goodsId);
+        //判断库存
+        if (goods.getStockCount() < 1) {
+            return RespBean.error(RespBeanEnum.EMPTY_STOCK);
+        }
+        //判断是否重复抢购
+        SeckillOrder seckillOrder = seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id", user.getId()).eq("goods_id", goodsId));
+        if (seckillOrder != null) {
+            return RespBean.error(RespBeanEnum.REPEATE_ERROR);
+        }
+        Order order = orderService.seckill(user, goods);
+        return RespBean.success(order);
     }
 }

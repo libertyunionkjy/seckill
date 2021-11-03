@@ -27,7 +27,9 @@ public enum RespBeanEnum {
     REPEATE_ERROR(500501,"不能重复秒杀！只能限购一件"),
     //更新密码
     MOBILE_NOT_EXIST(500213, "手机号码不存在"),
-    PASSWORD_UPDATE_FAIL(500214, "密码更新失败");
+    PASSWORD_UPDATE_FAIL(500214, "密码更新失败"),
+    //订单模块
+    ORDER_NOT_EXIST(500300, "订单信息不存在");
 
     private final Integer code;
     private final String message;
