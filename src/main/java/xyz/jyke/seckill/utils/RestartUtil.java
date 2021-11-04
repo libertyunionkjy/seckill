@@ -38,7 +38,7 @@ public class RestartUtil {
     }
 
     private static Connection getConn() throws Exception {
-        String url = "jdbc:mysql://localhost:3306/seckill?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai";
+        String url = "jdbc:mysql://47.103.1.87:3306/seckill?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai";
         String username = "root";
         String password = "12345678";
         String driver = "com.mysql.cj.jdbc.Driver";

@@ -25,7 +25,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     private GoodsMapper goodsMapper;
 
     /**
-     * 获取商品列表 * @return
+     * 获取秒杀商品列表 * @return
      */
     @Override
     public List<GoodsVo> findGoodsVo() {
