@@ -32,7 +32,7 @@ public class UserUtil {
             users.add(user);
         }
         System.out.println("create user done!");
-        //插入数据库
+        /*//插入数据库
         Connection conn = getConn();
         String sql = "insert into t_user(login_count, nickname, register_date, slat, password, id)values( ?,?,?,?,?,?)";
         PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -49,7 +49,7 @@ public class UserUtil {
         pstmt.executeBatch();
         pstmt.close();
         conn.close();
-        System.out.println("insert to db");
+        System.out.println("insert to db");*/
 
         //登录，生成token
         String urlString = "http://localhost:8080/login/doLogin";

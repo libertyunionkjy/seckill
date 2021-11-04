@@ -25,6 +25,7 @@ public enum RespBeanEnum {
     //秒杀模块
     EMPTY_STOCK(500500, "库存不足"),
     REPEATE_ERROR(500501,"不能重复秒杀！只能限购一件"),
+    RESUME_ERROR(500501,"恢复异常"),
     //更新密码
     MOBILE_NOT_EXIST(500213, "手机号码不存在"),
     PASSWORD_UPDATE_FAIL(500214, "密码更新失败"),
