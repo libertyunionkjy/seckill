@@ -53,11 +53,11 @@
         </tr>
         <tr>
             <td>秒杀价</td>
-            <td colspan="3" th:text="${goods.seckillPrice}"></td>
+            <td colspan="3" id="seckillPrice"></td>
         </tr>
         <tr>
             <td>库存数量</td>
-            <td colspan="3" th:text="${goods.stockCount}"></td>
+            <td colspan="3" id="stockCount"></td>
         </tr>
     </table>
 </div>
@@ -69,6 +69,41 @@
         getDetails();
     });
 
+    function getResult(goodsId) {
+        g_showLoading();
+        $.ajax({
+            url: "/seckill/result",
+            type: "GET",
+            data: {
+                goodsId: goodsId,
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    var result = data.obj;
+                    if (result < 0) {
+                        layer.msg("对不起，秒杀失败！")
+                    //否则做轮询
+                    } else if (result == 0) {
+                        setTimeout(function () {
+                            getResult(goodsId);
+                        }, 50);
+                    } else {
+                        layer.confirm("恭喜你，秒杀成功！查看订单？", {btn: ["确定", "取消"]},
+                            function () {
+                                window.location.href = "/orderDetail.htm?orderId=" + result;
+                            },
+                            function () {
+                                layer.close();
+                            });
+                    }
+                }
+            },
+            error: function () {
+                layer.msg("客户端请求错误");
+            }
+        })
+    }
+
     function doSeckill() {
         $.ajax({
             url: "/seckill/doSeckill",
@@ -78,8 +113,10 @@
             },
             success: function (data) {
                 if (data.code == 200) {
-                    window.location.href = "/orderDetail.htm?orderId=" + data.obj.id;
+                    // window.location.href = "/orderDetail.htm?orderId=" + data.obj.id;
+                    getResult($("#goodsId").val());
                 } else {
+                    //如果库存不足或者重复抢购会返回失败
                     layer.msg(data.message);
                 }
             },

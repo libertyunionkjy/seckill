@@ -33,6 +33,7 @@ import java.util.Map;
 /**
  * 优化前MacQPS：400
  * 优化后MacQPS：800
+ * 优化后+远程数据库QPS：500
  * 优化前服务器QPS：101.6
  *
  * @author junyu
@@ -129,12 +130,28 @@ public class SeckillController implements InitializingBean {
             return;
         }
         list.forEach(goodsVo -> {
-            redisTemplate.opsForValue().set("seckillGoods:" + goodsVo.getId(),
-                    goodsVo.getStockCount());
+            redisTemplate.opsForValue().set("seckillGoods:" + goodsVo.getId(), goodsVo.getStockCount());
             EmptyStockMap.put(goodsVo.getId(), false);
         });
     }
 
+
+    /**
+     * 获取秒杀结果
+     *
+     * @param user
+     * @param goodsId
+     * @return orderId:成功，-1:秒杀失败，0:排队中
+     */
+    @RequestMapping(value = "/result", method = RequestMethod.GET)
+    @ResponseBody
+    public RespBean getResult(User user, Long goodsId) {
+        if (user == null) {
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+        Long orderId = seckillOrderService.getResult(user, goodsId);
+        return RespBean.success(orderId);
+    }
 
     @RequestMapping("/resume")
     @ResponseBody
@@ -144,6 +161,14 @@ public class SeckillController implements InitializingBean {
         } catch (Exception e) {
             return RespBean.error(RespBeanEnum.RESUME_ERROR);
         }
+        List<GoodsVo> list = goodsService.findGoodsVo();
+        if (CollectionUtils.isEmpty(list)) {
+            return RespBean.success();
+        }
+        list.forEach(goodsVo -> {
+            redisTemplate.opsForValue().set("seckillGoods:" + goodsVo.getId(), goodsVo.getStockCount());
+            EmptyStockMap.put(goodsVo.getId(), false);
+        });
         return RespBean.success();
     }
 }

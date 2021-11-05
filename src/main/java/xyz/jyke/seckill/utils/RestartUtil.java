@@ -3,11 +3,15 @@ package xyz.jyke.seckill.utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import xyz.jyke.seckill.service.IGoodsService;
+import xyz.jyke.seckill.vo.GoodsVo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,6 +24,8 @@ import java.util.Set;
 public class RestartUtil {
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private IGoodsService goodsService;
 
     public void restartSecTest() throws Exception {
         Connection conn = getConn();
