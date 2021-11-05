@@ -55,7 +55,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         SeckillGoods seckillGoods = seckillGoodsService.getOne(new QueryWrapper<SeckillGoods>().eq("goods_id", goods.getId()));
         seckillGoods.setStockCount(seckillGoods.getStockCount() - 1);
         //解决超卖
-        boolean result = seckillGoodsService.update(new UpdateWrapper<SeckillGoods>().
+        seckillGoodsService.update(new UpdateWrapper<SeckillGoods>().
                 setSql("stock_count =" + "stock_count - 1").
                 eq("goods_id", goods.getId()).
                 gt("stock_count", 0));

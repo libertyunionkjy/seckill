@@ -26,6 +26,7 @@ import xyz.jyke.seckill.vo.GoodsVo;
 import xyz.jyke.seckill.vo.RespBean;
 import xyz.jyke.seckill.vo.RespBeanEnum;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
