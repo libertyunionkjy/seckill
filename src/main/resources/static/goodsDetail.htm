@@ -42,9 +42,15 @@
                     <button class="btn btn-primary btn-block" type="submit" id="buyButton">立即秒杀</button>
                     <input type="hidden" name="goodsId" id="goodsId"/>
                 </form>-->
-                <button class="btn btn-primary btn-block" type="button" id="buyButton" onclick="doSeckill()">立即秒杀
-                    <input type="hidden" name="goodsId" id="goodsId"/>
-                </button>
+                <div class="row">
+                    <div class="form-inline">
+                        <img id="captchaImg" width="130" height="32" style="display: none" onclick="refreshCaptcha()"/>
+                        <input id="captcha" class="form-control" style="display: none"/>
+                        <button class="btn btn-primary" type="button" id="buyButton" onclick="getSeckillPath()">立即秒杀
+                            <input type="hidden" name="goodsId" id="goodsId">
+                        </button>
+                    </div>
+                </div>
             </td>
         </tr>
         <tr>
@@ -69,6 +75,12 @@
         getDetails();
     });
 
+    function refreshCaptcha() {
+        var goodsId = $("#goodsId").val();
+        var captchaImg = "/seckill/captcha?goodsId=" + goodsId + "&time=" + new Date();
+        $("#captchaImg").attr("src", captchaImg);
+    }
+
     function getResult(goodsId) {
         g_showLoading();
         $.ajax({
@@ -82,7 +94,7 @@
                     var result = data.obj;
                     if (result < 0) {
                         layer.msg("对不起，秒杀失败！")
-                    //否则做轮询
+                        //否则做轮询
                     } else if (result == 0) {
                         setTimeout(function () {
                             getResult(goodsId);
@@ -104,9 +116,35 @@
         })
     }
 
-    function doSeckill() {
+    function getSeckillPath() {
+        var goodsId = $("#goodsId").val();
+        var captcha = $("#captcha").val();
+        g_showLoading();
         $.ajax({
-            url: "/seckill/doSeckill",
+            url: "/seckill/path",
+            type: "GET",
+            data: {
+                goodsId: goodsId,
+                captcha: captcha
+            },
+            success: function (data) {
+                if (data.code == 200) {
+                    var path = data.obj;
+                    //点击立即秒杀，得到秒杀地址后才真正的去进行秒杀下单
+                    doSeckill(path);
+                } else {
+                    layer.msg(data.message);
+                }
+            },
+            error: function () {
+                layer.msg("客户端请求错误");
+            }
+        })
+    }
+
+    function doSeckill(path) {
+        $.ajax({
+            url: "/seckill/" + path + "/doSeckill",
             type: "POST",
             data: {
                 goodsId: $("#goodsId").val()
@@ -181,10 +219,15 @@
                 clearTimeout(timeout);
             }
             $("#seckillTip").html("秒杀进行中");
+            $("#captchaImg").attr("src", "/seckill/captcha?goodsId=" + $("#goodsId").val() + "&time=" + new Date());
+            $("#captchaImg").show();
+            $("#captcha").show();
             //秒杀已经结束
         } else {
             $("#buyButton").attr("disabled", true);
             $("#seckillTip").html("秒杀已经结束");
+            $("#captchaImg").hide();
+            $("#captcha").hide();
         }
     }
 </script>
