@@ -180,4 +180,4 @@
 
 ### 参考资料
 
-[如何设计一个秒杀系统
+[如何设计一个秒杀系统](http://www.lichengblog.com/rhsjygmsxt/274.jhtml)
